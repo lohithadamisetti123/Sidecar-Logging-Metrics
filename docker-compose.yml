@@ -1,0 +1,180 @@
+version: '3.9'
+
+services:
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    environment:
+      - USER_SERVICE_PORT=${USER_SERVICE_PORT}
+      - SERVICE_NAME=user-service
+    ports:
+      - "${USER_SERVICE_PORT}:3001"
+    volumes:
+      - user_service_logs:/var/log/app
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  user-logging-sidecar:
+    build: ./logging-sidecar
+    container_name: user-logging-sidecar
+    environment:
+      - LOG_FILE_PATH=/var/log/app/app.log
+      - SERVICE_NAME=user-service
+      - ENVIRONMENT=${ENVIRONMENT}
+      - LOG_AGGREGATOR_URL=${LOG_AGGREGATOR_URL}
+      - LOG_POLL_INTERVAL_MS=${LOG_POLL_INTERVAL_MS}
+    volumes:
+      - user_service_logs:/var/log/app:ro
+    depends_on:
+      user-service:
+        condition: service_healthy
+
+  user-metrics-sidecar:
+    build: ./metrics-sidecar
+    container_name: user-metrics-sidecar
+    environment:
+      - TARGET_METRICS_URL=http://user-service:3001/metrics
+      - SERVICE_NAME=user-service
+      - ENVIRONMENT=${ENVIRONMENT}
+      - METRICS_SCRAPE_INTERVAL_SECONDS=${METRICS_SCRAPE_INTERVAL_SECONDS}
+      - METRICS_SIDECAR_PORT=${USER_METRICS_SIDECAR_PORT}
+    ports:
+      - "${USER_METRICS_SIDECAR_PORT}:${USER_METRICS_SIDECAR_PORT}"
+    depends_on:
+      user-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:${USER_METRICS_SIDECAR_PORT}/health || exit 0"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  product-service:
+    build: ./product-service
+    container_name: product-service
+    environment:
+      - PRODUCT_SERVICE_PORT=${PRODUCT_SERVICE_PORT}
+      - SERVICE_NAME=product-service
+    ports:
+      - "${PRODUCT_SERVICE_PORT}:3002"
+    volumes:
+      - product_service_logs:/var/log/app
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  product-logging-sidecar:
+    build: ./logging-sidecar
+    container_name: product-logging-sidecar
+    environment:
+      - LOG_FILE_PATH=/var/log/app/app.log
+      - SERVICE_NAME=product-service
+      - ENVIRONMENT=${ENVIRONMENT}
+      - LOG_AGGREGATOR_URL=${LOG_AGGREGATOR_URL}
+      - LOG_POLL_INTERVAL_MS=${LOG_POLL_INTERVAL_MS}
+    volumes:
+      - product_service_logs:/var/log/app:ro
+    depends_on:
+      product-service:
+        condition: service_healthy
+
+  product-metrics-sidecar:
+    build: ./metrics-sidecar
+    container_name: product-metrics-sidecar
+    environment:
+      - TARGET_METRICS_URL=http://product-service:3002/metrics
+      - SERVICE_NAME=product-service
+      - ENVIRONMENT=${ENVIRONMENT}
+      - METRICS_SCRAPE_INTERVAL_SECONDS=${METRICS_SCRAPE_INTERVAL_SECONDS}
+      - METRICS_SIDECAR_PORT=${PRODUCT_METRICS_SIDECAR_PORT}
+    ports:
+      - "${PRODUCT_METRICS_SIDECAR_PORT}:${PRODUCT_METRICS_SIDECAR_PORT}"
+    depends_on:
+      product-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:${PRODUCT_METRICS_SIDECAR_PORT}/health || exit 0"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    environment:
+      - ORDER_SERVICE_PORT=${ORDER_SERVICE_PORT}
+      - SERVICE_NAME=order-service
+    ports:
+      - "${ORDER_SERVICE_PORT}:3003"
+    volumes:
+      - order_service_logs:/var/log/app
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3003/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  order-logging-sidecar:
+    build: ./logging-sidecar
+    container_name: order-logging-sidecar
+    environment:
+      - LOG_FILE_PATH=/var/log/app/app.log
+      - SERVICE_NAME=order-service
+      - ENVIRONMENT=${ENVIRONMENT}
+      - LOG_AGGREGATOR_URL=${LOG_AGGREGATOR_URL}
+      - LOG_POLL_INTERVAL_MS=${LOG_POLL_INTERVAL_MS}
+    volumes:
+      - order_service_logs:/var/log/app:ro
+    depends_on:
+      order-service:
+        condition: service_healthy
+
+  order-metrics-sidecar:
+    build: ./metrics-sidecar
+    container_name: order-metrics-sidecar
+    environment:
+      - TARGET_METRICS_URL=http://order-service:3003/metrics
+      - SERVICE_NAME=order-service
+      - ENVIRONMENT=${ENVIRONMENT}
+      - METRICS_SCRAPE_INTERVAL_SECONDS=${METRICS_SCRAPE_INTERVAL_SECONDS}
+      - METRICS_SIDECAR_PORT=${ORDER_METRICS_SIDECAR_PORT}
+    ports:
+      - "${ORDER_METRICS_SIDECAR_PORT}:${ORDER_METRICS_SIDECAR_PORT}"
+    depends_on:
+      order-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:${ORDER_METRICS_SIDECAR_PORT}/health || exit 0"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  log-aggregator:
+    build: ./log-aggregator
+    container_name: log-aggregator
+    environment:
+      - LOG_AGGREGATOR_PORT=${LOG_AGGREGATOR_PORT}
+    ports:
+      - "${LOG_AGGREGATOR_PORT}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  user_service_logs: {}
+  product_service_logs: {}
+  order_service_logs: {}
