@@ -187,7 +187,7 @@ curl http://localhost:9101/metrics
 ## 🎥 Video Walkthrough
 
 
-![Watch Demo Video](https://your-video-link-here)
+[Watch Demo Video](https://your-video-link-here)
 
 
 ---
@@ -225,5 +225,4 @@ ENVIRONMENT=development
 LOG_FILE_PATH=/var/log/app/app.log
 ```
 
-```
-```
+
