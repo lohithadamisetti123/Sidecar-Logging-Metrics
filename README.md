@@ -1,3 +1,9 @@
+# Sidecar Logging and Metrics (Docker Compose)
+
+This project demonstrates centralized logging and metrics collection using the **sidecar pattern**. Each application service runs with a logging sidecar and a metrics sidecar, along with a shared log aggregator. The full stack runs using Docker Compose.
+
+---
+
 ## 📌 Overview
 
 Services included:
@@ -222,7 +228,6 @@ ENVIRONMENT=development
 
 LOG_FILE_PATH=/var/log/app/app.log
 ```
-
 
 ```
 ```
