@@ -186,17 +186,13 @@ curl http://localhost:9101/metrics
 
 ## 🎥 Video Walkthrough
 
-Add your demo video link below:
 
-```
-[Watch Demo Video](https://your-video-link-here)
-```
+![Watch Demo Video](https://your-video-link-here)
+
 
 ---
 
 ## 🖼 Screenshots
-
-Place screenshots in a `/docs` folder and reference like this:
 
 ### Docker Compose Status
 
@@ -208,11 +204,11 @@ Place screenshots in a `/docs` folder and reference like this:
 
 ### Sidecar Enriched Metrics
 
-![Metrics Sidecar](docs/metrics-sidecar.png)
+![Metrics Sidecar](docs/user-metrics-sidecar.png)
 
 ### Aggregated Logs
 
-![Log Aggregator Output](docs/log-aggregator.png)
+![Log Aggregator Output](docs/log-aggregator-logs.png)
 
 ---
 
