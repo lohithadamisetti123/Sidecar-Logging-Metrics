@@ -187,7 +187,7 @@ curl http://localhost:9101/metrics
 ## 🎥 Video Walkthrough
 
 
-[Watch Demo Video](https://your-video-link-here)
+[Watch Demo Video](https://youtu.be/xjG2_SKu2is?si=od3wp88wRid1SeOR)
 
 
 ---
